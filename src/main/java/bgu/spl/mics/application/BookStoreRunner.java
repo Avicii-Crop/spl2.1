@@ -24,7 +24,7 @@ public class BookStoreRunner {
             if(input==null) throw new NullPointerException();
         }catch(NullPointerException e){
             e.printStackTrace();
-            int x =5;
+
         }
 
     }
