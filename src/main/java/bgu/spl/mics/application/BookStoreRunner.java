@@ -18,7 +18,7 @@ import java.io.FileReader;
  */
 public class BookStoreRunner {
     public static void main(String[] args) {
-        int x = 3;
+        int x = 53535;
         InputJson input =getJson(args[0]);
         try{
             if(input==null) throw new NullPointerException();
