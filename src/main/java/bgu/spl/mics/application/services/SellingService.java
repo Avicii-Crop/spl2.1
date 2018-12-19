@@ -19,7 +19,8 @@ import bgu.spl.mics.application.passiveObjects.*;
  * You can add private fields and public methods to this class.
  * You MAY change constructor signatures and even add new public constructors.
  */
-public class SellingService extends MicroService{
+public class
+SellingService extends MicroService{
 	protected int currentTick = 0;
 
 	public SellingService(String name) {

@@ -3,13 +3,20 @@ package bgu.spl.mics.application;
 import bgu.spl.mics.application.passiveObjects.BookInventoryInfo;
 import bgu.spl.mics.application.passiveObjects.Customer;
 import bgu.spl.mics.application.passiveObjects.DeliveryVehicle;
+import bgu.spl.mics.application.passiveObjects.Inventory;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.nio.file.Files;
 
 import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.nio.file.Paths;
 
 
 /** This is the Main class of the application. You should parse the input file,
@@ -17,39 +24,49 @@ import java.io.FileReader;
  * In the end, you should output serialized objects.
  */
 public class BookStoreRunner {
+    public static Gson gson=new Gson();
     public static void main(String[] args) {
-        int x = 53535;
-        InputJson input =getJson(args[0]);
-        try{
-            if(input==null) throw new NullPointerException();
-        }catch(NullPointerException e){
-            e.printStackTrace();
 
+        Gson gson=new Gson();
+        JsonObject json = new JsonObject();
+        JsonParser pars = new JsonParser();
+
+
+
+        try {
+            json = pars.parse(new FileReader(args[0])).getAsJsonObject();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
+
+        initInventory(json);
+        initResorces(json);
 
     }
 
+    private static void initResorces(JsonObject json) {
+        JsonArray jsonArray=json.getAsJsonArray("initialResources").get(0).getAsJsonObject().getAsJsonArray("vehicles");
+
+    }
+
+    private static void initInventory(JsonObject json) {
+        JsonArray jsonArray=json.getAsJsonArray("initialInventory");
+        Inventory.getInstance().load(gson.fromJson(jsonArray,BookInventoryInfo[].class));
+    }
+
     private static InputJson getJson(String arg0){
-        Gson gson=new Gson();
-        InputJson output=null;
-        try {
-            BufferedReader json=new BufferedReader(new FileReader(arg0));
-            output=gson.fromJson(json,InputJson.class);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+//
+//        Staff staff = gson.fromJson(new FileReader("D:\\file.json"), Staff.class);
+//        User u=gson.fromJson(jsonstring, User.class);
+
+
         return output;
     }
 
     /**
      * Ths class represent  the JSON object which we are getting in the input to initialize the store.
      */
-    public class InputJson{
-        private InitBook[] initialInventory;
-        private InitVehicle[] initialResources;
-        private InitService[] services;
+
 
         public class InitBook{
             private String bookTitle;
@@ -218,7 +235,7 @@ public class BookStoreRunner {
 
 
         }
-    }
+
 
 
 
