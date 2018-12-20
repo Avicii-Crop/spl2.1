@@ -1,13 +1,13 @@
 package bgu.spl.mics.application;
 
-import bgu.spl.mics.application.passiveObjects.BookInventoryInfo;
-import bgu.spl.mics.application.passiveObjects.Customer;
-import bgu.spl.mics.application.passiveObjects.DeliveryVehicle;
+import bgu.spl.mics.application.passiveObjects.*;
+import bgu.spl.mics.application.services.SellingService;
+import bgu.spl.mics.application.services.TimeService;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
-import javax.swing.*;
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 
@@ -17,39 +17,87 @@ import java.io.FileReader;
  * In the end, you should output serialized objects.
  */
 public class BookStoreRunner {
+    private static Gson gson=new Gson();
+    private static Thread timer;
+    private static Thread[] sellingServices;
+    private static Thread[] inventoryServices;
+    private static Thread[] logisticServices;
+    private static Thread[] resourceServices;
+    private static Thread[] apiServices;
     public static void main(String[] args) {
-        int x = 53535;
-        InputJson input =getJson(args[0]);
-        try{
-            if(input==null) throw new NullPointerException();
-        }catch(NullPointerException e){
-            e.printStackTrace();
 
+        Gson gson=new Gson();
+        JsonObject json = new JsonObject();
+        JsonParser pars = new JsonParser();
+
+
+
+        try {
+            json = pars.parse(new FileReader(args[0])).getAsJsonObject();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
+
+        initInventory(json);
+        initResources(json);
+        initServices(json.getAsJsonObject("services"));
 
     }
 
-    private static InputJson getJson(String arg0){
-        Gson gson=new Gson();
-        InputJson output=null;
-        try {
-            BufferedReader json=new BufferedReader(new FileReader(arg0));
-            output=gson.fromJson(json,InputJson.class);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }catch (Exception e){
-            e.printStackTrace();
+    private static void initServices(JsonObject services) {
+        int numOfServices=services.getAsJsonPrimitive("selling").getAsInt();
+        sellingServices=new Thread[numOfServices];
+        for(int i=0;i<numOfServices;i++) {
+            String name="sell"+i;
+            sellingServices[i] = new Thread(new SellingService(name));
+            sellingServices[i].start();
         }
+        initService("sell",SellingService s,sellingServices=new Thread[numOfServices],null);
+        initTime(services.getAsJsonObject("time"));
+    }
+
+    private static void initService(String name,Object type,Thread[] threads, Object o) {
+        if(o==null){
+            for(int i=0;i<threads.length;i++){
+                String serviceName=name+i;
+                threads[i]=new Thread(new type(String));
+            }
+
+        }
+    }
+
+
+    private static void initTime(JsonObject time) {
+        int speed=time.getAsJsonPrimitive("speed").getAsInt();
+        int duration=time.getAsJsonPrimitive("duration").getAsInt();
+        timer=new Thread(new TimeService("timer",speed,duration));
+    }
+
+
+    private static void initResources(JsonObject json) {
+        JsonArray jsonArray=json.getAsJsonArray("initialResources").get(0).getAsJsonObject().getAsJsonArray("vehicles");
+        ResourcesHolder.getInstance().load(gson.fromJson(jsonArray,DeliveryVehicle[].class));
+
+    }
+
+    private static void initInventory(JsonObject json) {
+        JsonArray jsonArray=json.getAsJsonArray("initialInventory");
+        Inventory.getInstance().load(gson.fromJson(jsonArray,BookInventoryInfo[].class));
+    }
+
+    private static InputJson getJson(String arg0){
+//
+//        Staff staff = gson.fromJson(new FileReader("D:\\file.json"), Staff.class);
+//        User u=gson.fromJson(jsonstring, User.class);
+
+
         return output;
     }
 
     /**
      * Ths class represent  the JSON object which we are getting in the input to initialize the store.
      */
-    public class InputJson{
-        private InitBook[] initialInventory;
-        private InitVehicle[] initialResources;
-        private InitService[] services;
+
 
         public class InitBook{
             private String bookTitle;
@@ -218,7 +266,7 @@ public class BookStoreRunner {
 
 
         }
-    }
+
 
 
 

@@ -15,9 +15,9 @@ import java.io.Serializable;
 		private int customer;
 		private String bookTitle;
 		private int price;
-		private int orderTick;
-		private int issuedTick;
-	private int proccessTick;
+		private int orderTick = 0;
+		private int issuedTick = 0;
+	private int proccessTick = 0;
 
 	public OrderReceipt(int orderId, String seller, int customer, String bookTitle, int price, int orderTick, int issuedTick, int proccessTick) {
 
