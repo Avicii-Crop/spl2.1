@@ -1,8 +1,8 @@
 package bgu.spl.mics.application.services;
 
+import bgu.spl.mics.Future;
 import bgu.spl.mics.MicroService;
-import bgu.spl.mics.application.messages.BookOrderEvent;
-import bgu.spl.mics.application.messages.TickBroadcast;
+import bgu.spl.mics.application.messages.*;
 import bgu.spl.mics.application.passiveObjects.*;
 
 //Avishai
@@ -19,11 +19,11 @@ import bgu.spl.mics.application.passiveObjects.*;
  */
 public class
 SellingService extends MicroService{
-	protected int currentTick = 0;
-	MoneyRegister moneyRegister;
+	private int currentTick = 0;
+	private MoneyRegister moneyRegister;
 
-	public SellingService(String name) {
-		super(name);
+	public SellingService(int i) {
+		super("selling" + i);
 		this.moneyRegister = MoneyRegister.getInstance();
 	}
 
@@ -31,8 +31,18 @@ SellingService extends MicroService{
 	protected void initialize() {
 		subscribeBroadcast(TickBroadcast.class, br -> currentTick=br.getTick());
 		subscribeEvent(BookOrderEvent.class, ev -> {
-		});
-		
+			Customer c = ev.getCustomer();
+			Future<Integer> bookPrice = sendEvent(new AvailabilityEvent());
+			synchronized (c) {
+				if (bookPrice.get() != -1 && bookPrice.get() < c.getAvailableCreditAmount()) {
+					Future<OrderResult> orderResult = sendEvent(new PurchaseEvent());
+					if (orderResult.get() == OrderResult.SUCCESSFULLY_TAKEN){
+						sendEvent(new DeliveryEvent());
+
+					}
+				}
+			}});
+
 	}
 
 }
