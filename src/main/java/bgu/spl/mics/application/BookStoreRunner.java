@@ -1,8 +1,7 @@
 package bgu.spl.mics.application;
 
 import bgu.spl.mics.application.passiveObjects.*;
-import bgu.spl.mics.application.services.SellingService;
-import bgu.spl.mics.application.services.TimeService;
+import bgu.spl.mics.application.services.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -10,6 +9,8 @@ import com.google.gson.JsonParser;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.lang.reflect.*;
+import java.util.*;
 
 
 /** This is the Main class of the application. You should parse the input file,
@@ -45,25 +46,51 @@ public class BookStoreRunner {
     }
 
     private static void initServices(JsonObject services) {
-        int numOfServices=services.getAsJsonPrimitive("selling").getAsInt();
-        sellingServices=new Thread[numOfServices];
-        for(int i=0;i<numOfServices;i++) {
-            String name="sell"+i;
-            sellingServices[i] = new Thread(new SellingService(name));
-            sellingServices[i].start();
+
+//        sellingServices=new Thread[numOfServices];
+//        for(int i=0;i<numOfServices;i++) {
+//            sellingServices[i] = new Thread(new SellingService(i));
+//            sellingServices[i].start();
+//        }
+//
+//        numOfServices=services.getAsJsonPrimitive("inventoryService").getAsInt();
+//        inventoryServices=new Thread[numOfServices];
+//        for(int i=0;i<numOfServices;i++) {
+//            inventoryServices[i] = new Thread(new SellingService(i));
+//            inventoryServices[i].start();
+//        }
+        try {
+            int numOfServices=services.getAsJsonPrimitive("selling").getAsInt();
+            initService(SellingService.class,sellingServices=new Thread[numOfServices]);
+
+            numOfServices=services.getAsJsonPrimitive("inventoryService").getAsInt();
+            initService( InventoryService.class,inventoryServices=new Thread[numOfServices]);
+
+            numOfServices=services.getAsJsonPrimitive("logistics").getAsInt();
+            initService( LogisticsService.class,logisticServices=new Thread[numOfServices]);
+
+            numOfServices=services.getAsJsonPrimitive("resourcesService").getAsInt();
+            initService( ResourceService.class,resourceServices=new Thread[numOfServices]);
+
+
+
+        } catch (ClassNotFoundException|NoSuchMethodException|
+                IllegalAccessException|InvocationTargetException|InstantiationException e) {
+            e.printStackTrace();
         }
-        initService("sell",SellingService s,sellingServices=new Thread[numOfServices],null);
         initTime(services.getAsJsonObject("time"));
     }
 
-    private static void initService(String name,Object type,Thread[] threads, Object o) {
-        if(o==null){
+    private static void initService(Class<?> type,Thread[] threads) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+
+        Constructor con=type.getConstructor(Integer.class);
+
             for(int i=0;i<threads.length;i++){
-                String serviceName=name+i;
-                threads[i]=new Thread(new type(String));
+                Constructor c;
+                threads[i]=new Thread((Runnable) con.newInstance(i));
             }
 
-        }
+
     }
 
 
@@ -85,14 +112,7 @@ public class BookStoreRunner {
         Inventory.getInstance().load(gson.fromJson(jsonArray,BookInventoryInfo[].class));
     }
 
-    private static InputJson getJson(String arg0){
-//
-//        Staff staff = gson.fromJson(new FileReader("D:\\file.json"), Staff.class);
-//        User u=gson.fromJson(jsonstring, User.class);
 
-
-        return output;
-    }
 
     /**
      * Ths class represent  the JSON object which we are getting in the input to initialize the store.
