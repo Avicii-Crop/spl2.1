@@ -2,10 +2,7 @@ package bgu.spl.mics.application;
 
 import bgu.spl.mics.application.passiveObjects.*;
 import bgu.spl.mics.application.services.*;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -78,16 +75,42 @@ public class BookStoreRunner {
                 IllegalAccessException|InvocationTargetException|InstantiationException e) {
             e.printStackTrace();
         }
+
+        intiAPI(services.getAsJsonArray("customers"));
+
         initTime(services.getAsJsonObject("time"));
     }
 
+
+
+    private static void intiAPI(JsonArray customers) {
+        apiServices=new Thread[customers.size()];
+        Iterator<JsonElement> itCustomer=customers.iterator();
+        Customer customer;
+        Customer.OrderSchedule[] orderSchedules;
+        for (int i=0;i<apiServices.length&itCustomer.hasNext();i++){
+            customer=gson.fromJson(customers.get(i).getAsJsonObject(),Customer.class);
+            orderSchedules= getSchedule(customers.get(i).getAsJsonObject());
+            apiServices[i]=new Thread(new APIService(i,customer,orderSchedules));
+            apiServices[i].start();
+
+        }
+
+    }
+
+    private static Customer.OrderSchedule[] getSchedule(JsonObject customer){
+
+        return  gson.fromJson( customer.getAsJsonArray("orderSchedule"), Customer.OrderSchedule[].class);
+    }
+
+
     private static void initService(Class<?> type,Thread[] threads) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
 
-        Constructor con=type.getConstructor(Integer.class);
+        Constructor con=type.getConstructor(String.class);
 
             for(int i=0;i<threads.length;i++){
-                Constructor c;
-                threads[i]=new Thread((Runnable) con.newInstance(i));
+                Integer x=i;
+                threads[i]=new Thread((Runnable) con.newInstance(x.toString()));
             }
 
 
@@ -118,174 +141,174 @@ public class BookStoreRunner {
      * Ths class represent  the JSON object which we are getting in the input to initialize the store.
      */
 
-
-        public class InitBook{
-            private String bookTitle;
-            private int amount;
-            private int price;
-
-            /**
-             * Initialize BookInventoryInfo object
-             * @return BookInventoryInfo object
-             */
-            public BookInventoryInfo getBookInventoryInfo(){
-                return new BookInventoryInfo(bookTitle,amount,price);
-            }
-
-            public String getBookTitle() {
-                return bookTitle;
-            }
-
-            public int getAmount() {
-                return amount;
-            }
-
-            public int getPrice() {
-                return price;
-            }
-        }
-
-        public class InitVehicle{
-            private DeliveryVehicle[] vehicles;
-
-            public DeliveryVehicle[] getVehicles() {
-                return vehicles;
-            }
-        }
-
-        public class  InitService{
-            private InitTime time;
-            private int selling;
-            private int inventoryService;
-            private int resourcesService;
-            private InitCustomer[] customers;
-
-            public InitCustomer[] getCustomers() {
-                return customers;
-            }
-
-            public InitTime getTime() {
-                return time;
-            }
-
-            public int getInventoryService() {
-                return inventoryService;
-            }
-
-            public int getResourcesService() {
-                return resourcesService;
-            }
-
-            public int getSelling() {
-                return selling;
-            }
-
-
-        }
-        public class InitCustomer{
-            private int id;
-            private String name;
-            private String address;
-            private int distance;
-            private CreditCard creditCard;
-            private OrderSchedule[] orderSchedule;
-
-            /**
-             * Initialize Customer object.
-             * @return Customer object
-             */
-            public Customer getCustomer(){
-                return new Customer(name,id, address,distance,creditCard.getNumber(),creditCard.getAmount());
-            }
-
-            public int getDistance() {
-                return distance;
-            }
-
-            public int getId() {
-                return id;
-            }
-
-            public CreditCard getCreditCard() {
-                return creditCard;
-            }
-
-            public OrderSchedule[] getOrderSchedule() {
-                return orderSchedule;
-            }
-
-            public String getAddress() {
-                return address;
-            }
-
-            public String getName() {
-                return name;
-            }
-
-
-
-        }
-
-        public class CreditCard{
-            private int number;
-            private int amount;
-
-            public CreditCard(int number,int amount){
-                this.number=number;
-                this.amount=amount;
-            }
-
-            public int getAmount() {
-                return amount;
-            }
-
-            public int getNumber() {
-                return number;
-            }
-        }
-
-        public class OrderSchedule implements Comparable<OrderSchedule>{
-            private String bookTitle;
-            private int tick;
-
-            public OrderSchedule(String bookTitle,int tick){
-                this.bookTitle=bookTitle;
-                this.tick=tick;
-            }
-
-            public int getTick() {
-                return tick;
-            }
-
-            public String getBookTitle() {
-                return bookTitle;
-            }
-
-            public void setBookTitle(String bookTitle) {
-                this.bookTitle = bookTitle;
-            }
-
-            @Override
-            public int compareTo(OrderSchedule o) {
-                return this.tick-o.getTick();
-            }
-        }
-
-        public class InitTime{
-            private int speed;
-            private int duration;
-
-            public InitTime(int speed,int duration){
-                this.speed=speed;
-                this.duration=duration;
-            }
-
-            public int getSpeed(){return speed;}
-
-            public int getDuration(){return duration;}
-
-
-        }
+//
+//        public class InitBook{
+//            private String bookTitle;
+//            private int amount;
+//            private int price;
+//
+//            /**
+//             * Initialize BookInventoryInfo object
+//             * @return BookInventoryInfo object
+//             */
+//            public BookInventoryInfo getBookInventoryInfo(){
+//                return new BookInventoryInfo(bookTitle,amount,price);
+//            }
+//
+//            public String getBookTitle() {
+//                return bookTitle;
+//            }
+//
+//            public int getAmount() {
+//                return amount;
+//            }
+//
+//            public int getPrice() {
+//                return price;
+//            }
+//        }
+//
+//        public class InitVehicle{
+//            private DeliveryVehicle[] vehicles;
+//
+//            public DeliveryVehicle[] getVehicles() {
+//                return vehicles;
+//            }
+//        }
+//
+//        public class  InitService{
+//            private InitTime time;
+//            private int selling;
+//            private int inventoryService;
+//            private int resourcesService;
+//            private InitCustomer[] customers;
+//
+//            public InitCustomer[] getCustomers() {
+//                return customers;
+//            }
+//
+//            public InitTime getTime() {
+//                return time;
+//            }
+//
+//            public int getInventoryService() {
+//                return inventoryService;
+//            }
+//
+//            public int getResourcesService() {
+//                return resourcesService;
+//            }
+//
+//            public int getSelling() {
+//                return selling;
+//            }
+//
+//
+//        }
+//        public class InitCustomer{
+//            private int id;
+//            private String name;
+//            private String address;
+//            private int distance;
+//            private CreditCard creditCard;
+//            private OrderSchedule[] orderSchedule;
+//
+//            /**
+//             * Initialize Customer object.
+//             * @return Customer object
+//             */
+//            public Customer getCustomer(){
+//                return new Customer(name,id, address,distance,creditCard.getNumber(),creditCard.getAmount());
+//            }
+//
+//            public int getDistance() {
+//                return distance;
+//            }
+//
+//            public int getId() {
+//                return id;
+//            }
+//
+//            public CreditCard getCreditCard() {
+//                return creditCard;
+//            }
+//
+//            public OrderSchedule[] getOrderSchedule() {
+//                return orderSchedule;
+//            }
+//
+//            public String getAddress() {
+//                return address;
+//            }
+//
+//            public String getName() {
+//                return name;
+//            }
+//
+//
+//
+//        }
+//
+//        public class CreditCard{
+//            private int number;
+//            private int amount;
+//
+//            public CreditCard(int number,int amount){
+//                this.number=number;
+//                this.amount=amount;
+//            }
+//
+//            public int getAmount() {
+//                return amount;
+//            }
+//
+//            public int getNumber() {
+//                return number;
+//            }
+//        }
+//
+//        public class OrderSchedule implements Comparable<OrderSchedule>{
+//            private String bookTitle;
+//            private int tick;
+//
+//            public OrderSchedule(String bookTitle,int tick){
+//                this.bookTitle=bookTitle;
+//                this.tick=tick;
+//            }
+//
+//            public int getTick() {
+//                return tick;
+//            }
+//
+//            public String getBookTitle() {
+//                return bookTitle;
+//            }
+//
+//            public void setBookTitle(String bookTitle) {
+//                this.bookTitle = bookTitle;
+//            }
+//
+//            @Override
+//            public int compareTo(OrderSchedule o) {
+//                return this.tick-o.getTick();
+//            }
+//        }
+//
+//        public class InitTime{
+//            private int speed;
+//            private int duration;
+//
+//            public InitTime(int speed,int duration){
+//                this.speed=speed;
+//                this.duration=duration;
+//            }
+//
+//            public int getSpeed(){return speed;}
+//
+//            public int getDuration(){return duration;}
+//
+//
+//        }
 
 
 
