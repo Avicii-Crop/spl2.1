@@ -91,7 +91,7 @@ public class BookStoreRunner {
         for (int i=0;i<apiServices.length&itCustomer.hasNext();i++){
             customer=gson.fromJson(customers.get(i).getAsJsonObject(),Customer.class);
             orderSchedules= getSchedule(customers.get(i).getAsJsonObject());
-            apiServices[i]=new Thread(new APIService(String.valueOf(i),customer,orderSchedules));
+            apiServices[i]=new Thread(new APIService(String.valueOf(i),orderSchedules,customer));
             apiServices[i].start();
 
         }

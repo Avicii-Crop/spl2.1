@@ -10,13 +10,13 @@ package bgu.spl.mics.application.passiveObjects;
  */
 public class BookInventoryInfo {
 
-	private String bookTitle;
+	private String name;
 	private int amount;
 	private int price;
 
 
 	public BookInventoryInfo(String name, int amount,int price){
-		this.bookTitle=name;
+		this.name=name;
 		this.amount=amount;
 		this.price=price;
 	}
@@ -34,7 +34,7 @@ public class BookInventoryInfo {
      * @return The title of this book.   
      */
 	public String getBookTitle() {
-		return bookTitle;
+		return name;
 	}
 
 	/**
