@@ -20,8 +20,8 @@ public class TimeService extends MicroService {
 	private int speed;
 	private int duration;
 
-	public TimeService(String name, int speed, int duration) {
-		super(name);
+	public TimeService(int speed, int duration) {
+		super("timer");
 		this.speed = speed;
 		this.duration = duration;
 	}

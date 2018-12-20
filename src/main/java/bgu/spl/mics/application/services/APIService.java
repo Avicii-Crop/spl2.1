@@ -28,8 +28,8 @@ public class APIService extends MicroService{
 
 
 
-	public APIService(int i, OrderSchedule[] orderSchedule, Customer customer) {
-		super("webAPI" + i);
+	public APIService(String num, OrderSchedule[] orderSchedule, Customer customer) {
+		super("webAPI" + num);
 		this.orderSchedule = orderSchedule;
 		this.customer = customer;
 		Arrays.sort(orderSchedule);
@@ -43,6 +43,7 @@ public class APIService extends MicroService{
 				index++;
 				BookOrderEvent bookOrderEvent = new BookOrderEvent(currentTick,customer);
 				Future<OrderReceipt> orderReceipt = sendEvent(bookOrderEvent);
+				complete(orderReceipt, );
 				if (orderReceipt.get() != null){
 					customer.addOrderReciept(orderReceipt);
 				}

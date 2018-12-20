@@ -19,13 +19,13 @@ import java.io.Serializable;
 		private int issuedTick = 0;
 	private int proccessTick = 0;
 
-	public OrderReceipt(int orderId, String seller, int customer, String bookTitle, int price, int orderTick, int issuedTick, int proccessTick) {
-
+	public OrderReceipt(int orderId, String seller, int customer, String bookTitle, int price) {
+		this.orderId = orderId;
+		this.customer = customer;
+		this.bookTitle = bookTitle;
+		this.seller = seller;
+		this.price = price;
 	}
-
-	public boolean get() {
-		return
-		}
 
 		/**
      * Retrieves the orderId of this receipt.

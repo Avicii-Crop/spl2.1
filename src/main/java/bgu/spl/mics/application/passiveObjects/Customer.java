@@ -86,6 +86,7 @@ public class Customer {
 		return creditCard;
 	}
 
-	public void addOrderReciept()
-	
+	public void addOrderReciept(OrderReceipt orderReceipt){
+		receipts.add(orderReceipt);
+	}
 }

@@ -22,8 +22,8 @@ SellingService extends MicroService{
 	private int currentTick = 0;
 	private MoneyRegister moneyRegister;
 
-	public SellingService(int i) {
-		super("selling" + i);
+	public SellingService(String num) {
+		super("selling" + num);
 		this.moneyRegister = MoneyRegister.getInstance();
 	}
 
@@ -38,11 +38,11 @@ SellingService extends MicroService{
 					Future<OrderResult> orderResult = sendEvent(new PurchaseEvent());
 					if (orderResult.get() == OrderResult.SUCCESSFULLY_TAKEN){
 						sendEvent(new DeliveryEvent());
+						complete(BookOrderEvent, );
 
 					}
 				}
 			}});
-
 	}
 
 }
