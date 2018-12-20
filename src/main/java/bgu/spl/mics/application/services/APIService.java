@@ -39,7 +39,10 @@ public class APIService extends MicroService{
 				index++;
 				BookOrderEvent bookOrderEvent = new BookOrderEvent(currentTick);
 				Future<OrderReceipt> orderReceipt = sendEvent(bookOrderEvent);
-				
+				if (orderReceipt.get() != null){
+					customer.
+
+				}
 			}
 		});
 
