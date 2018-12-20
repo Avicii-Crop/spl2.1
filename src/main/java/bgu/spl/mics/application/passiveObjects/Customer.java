@@ -85,5 +85,7 @@ public class Customer {
 
 		return creditCard;
 	}
+
+	public void addOrderReciept()
 	
 }
