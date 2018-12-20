@@ -38,7 +38,7 @@ SellingService extends MicroService{
 					Future<OrderResult> orderResult = sendEvent(new PurchaseEvent());
 					if (orderResult.get() == OrderResult.SUCCESSFULLY_TAKEN){
 						sendEvent(new DeliveryEvent());
-						complete(BookOrderEvent, );
+//						complete(BookOrderEvent, );
 
 					}
 				}
