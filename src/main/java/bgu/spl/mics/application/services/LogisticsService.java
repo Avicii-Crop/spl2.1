@@ -14,9 +14,16 @@ import bgu.spl.mics.MicroService;
 public class LogisticsService extends MicroService {
 
 	public LogisticsService() {
+		super("log");
+		// TODO Implement this
+	}
+
+	public LogisticsService(int i) {
+		String s="log"+i;
 		super("Change_This_Name");
 		// TODO Implement this
 	}
+
 
 	@Override
 	protected void initialize() {
