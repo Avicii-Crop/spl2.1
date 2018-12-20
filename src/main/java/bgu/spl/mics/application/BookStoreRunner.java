@@ -1,22 +1,15 @@
 package bgu.spl.mics.application;
 
-import bgu.spl.mics.application.passiveObjects.BookInventoryInfo;
-import bgu.spl.mics.application.passiveObjects.Customer;
-import bgu.spl.mics.application.passiveObjects.DeliveryVehicle;
-import bgu.spl.mics.application.passiveObjects.Inventory;
+import bgu.spl.mics.application.passiveObjects.*;
+import bgu.spl.mics.application.services.SellingService;
+import bgu.spl.mics.application.services.TimeService;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import java.nio.file.Files;
-
-import javax.swing.*;
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.nio.file.Paths;
 
 
 /** This is the Main class of the application. You should parse the input file,
@@ -24,7 +17,13 @@ import java.nio.file.Paths;
  * In the end, you should output serialized objects.
  */
 public class BookStoreRunner {
-    public static Gson gson=new Gson();
+    private static Gson gson=new Gson();
+    private static Thread timer;
+    private static Thread[] sellingServices;
+    private static Thread[] inventoryServices;
+    private static Thread[] logisticServices;
+    private static Thread[] resourceServices;
+    private static Thread[] apiServices;
     public static void main(String[] args) {
 
         Gson gson=new Gson();
@@ -40,12 +39,44 @@ public class BookStoreRunner {
         }
 
         initInventory(json);
-        initResorces(json);
+        initResources(json);
+        initServices(json.getAsJsonObject("services"));
 
     }
 
-    private static void initResorces(JsonObject json) {
+    private static void initServices(JsonObject services) {
+        int numOfServices=services.getAsJsonPrimitive("selling").getAsInt();
+        sellingServices=new Thread[numOfServices];
+        for(int i=0;i<numOfServices;i++) {
+            String name="sell"+i;
+            sellingServices[i] = new Thread(new SellingService(name));
+            sellingServices[i].start();
+        }
+        initService("sell",SellingService s,sellingServices=new Thread[numOfServices],null);
+        initTime(services.getAsJsonObject("time"));
+    }
+
+    private static void initService(String name,Object type,Thread[] threads, Object o) {
+        if(o==null){
+            for(int i=0;i<threads.length;i++){
+                String serviceName=name+i;
+                threads[i]=new Thread(new type(String));
+            }
+
+        }
+    }
+
+
+    private static void initTime(JsonObject time) {
+        int speed=time.getAsJsonPrimitive("speed").getAsInt();
+        int duration=time.getAsJsonPrimitive("duration").getAsInt();
+        timer=new Thread(new TimeService("timer",speed,duration));
+    }
+
+
+    private static void initResources(JsonObject json) {
         JsonArray jsonArray=json.getAsJsonArray("initialResources").get(0).getAsJsonObject().getAsJsonArray("vehicles");
+        ResourcesHolder.getInstance().load(gson.fromJson(jsonArray,DeliveryVehicle[].class));
 
     }
 

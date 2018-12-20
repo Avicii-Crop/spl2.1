@@ -18,6 +18,12 @@ public class LogisticsService extends MicroService {
 		// TODO Implement this
 	}
 
+	public LogisticsService(String name) {
+		super("Change_This_Name");
+		// TODO Implement this
+	}
+
+
 	@Override
 	protected void initialize() {
 		// TODO Implement this
