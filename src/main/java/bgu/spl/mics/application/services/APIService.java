@@ -8,6 +8,8 @@ import bgu.spl.mics.application.messages.BookOrderEvent;
 	import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.passiveObjects.Customer;
 import bgu.spl.mics.application.passiveObjects.OrderReceipt;
+import com.sun.org.apache.xpath.internal.operations.Or;
+
 import java.util.Arrays;
 
 /**
@@ -20,12 +22,14 @@ import java.util.Arrays;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class APIService extends MicroService{
-	private BookOrderEvent[] orderSchedule;
+	private OrderSchedule[] orderSchedule;
 	private Customer customer;
 	private int currentTick = 0;
 
-	public APIService(String name, BookOrderEvent[] orderSchedule, Customer customer) {
-		super(name);
+
+
+	public APIService(int i, OrderSchedule[] orderSchedule, Customer customer) {
+		super("webAPI" + i);
 		this.orderSchedule = orderSchedule;
 		this.customer = customer;
 		Arrays.sort(orderSchedule);
@@ -37,15 +41,13 @@ public class APIService extends MicroService{
 			int index = 0;
 			while (orderSchedule[index].getTick() == currentTick) {
 				index++;
-				BookOrderEvent bookOrderEvent = new BookOrderEvent(currentTick);
+				BookOrderEvent bookOrderEvent = new BookOrderEvent(currentTick,customer);
 				Future<OrderReceipt> orderReceipt = sendEvent(bookOrderEvent);
 				if (orderReceipt.get() != null){
-					customer.
-
+					customer.addOrderReciept(orderReceipt);
 				}
 			}
 		});
-
 		}
 	}
 
