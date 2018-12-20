@@ -9,8 +9,9 @@ public class BookOrderEvent implements Event {
     private int issuedTick;
     private Customer customer;
 
-    public BookOrderEvent(int orderTick) {
+    public BookOrderEvent(int orderTick, Customer customer) {
         this.orderTick = orderTick;
+        this.customer = customer;
     }
 
     public Customer getCustomer() {
