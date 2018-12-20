@@ -91,7 +91,7 @@ public class BookStoreRunner {
         for (int i=0;i<apiServices.length&itCustomer.hasNext();i++){
             customer=gson.fromJson(customers.get(i).getAsJsonObject(),Customer.class);
             orderSchedules= getSchedule(customers.get(i).getAsJsonObject());
-            apiServices[i]=new Thread(new APIService(i,customer,orderSchedules));
+            apiServices[i]=new Thread(new APIService(String.valueOf(i),customer,orderSchedules));
             apiServices[i].start();
 
         }
@@ -109,8 +109,7 @@ public class BookStoreRunner {
         Constructor con=type.getConstructor(String.class);
 
             for(int i=0;i<threads.length;i++){
-                Integer x=i;
-                threads[i]=new Thread((Runnable) con.newInstance(x.toString()));
+                threads[i]=new Thread((Runnable) con.newInstance(String.valueOf(i)));
             }
 
 
@@ -120,7 +119,7 @@ public class BookStoreRunner {
     private static void initTime(JsonObject time) {
         int speed=time.getAsJsonPrimitive("speed").getAsInt();
         int duration=time.getAsJsonPrimitive("duration").getAsInt();
-        timer=new Thread(new TimeService("timer",speed,duration));
+        timer=new Thread(new TimeService(speed,duration));
     }
 
 
