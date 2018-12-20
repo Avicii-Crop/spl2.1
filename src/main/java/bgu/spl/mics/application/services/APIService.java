@@ -5,12 +5,10 @@ import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.BookStoreRunner;
 import bgu.spl.mics.application.BookStoreRunner.InputJson.OrderSchedule;
 import bgu.spl.mics.application.messages.BookOrderEvent;
-import bgu.spl.mics.application.messages.TickBroadcast;
+	import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.passiveObjects.Customer;
 import bgu.spl.mics.application.passiveObjects.OrderReceipt;
-
 import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * APIService is in charge of the connection between a client and the store.
@@ -22,25 +20,29 @@ import java.util.Collections;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class APIService extends MicroService{
-	private OrderSchedule[] orderSchedule;
-	private Customer cusmtomer;
+	private BookOrderEvent[] orderSchedule;
+	private Customer customer;
 	private int currentTick = 0;
 
-	public APIService(String name, OrderSchedule[] orderSchedule, Customer customer) {
+	public APIService(String name, BookOrderEvent[] orderSchedule, Customer customer) {
 		super(name);
 		this.orderSchedule = orderSchedule;
-		this.cusmtomer = customer;
+		this.customer = customer;
 		Arrays.sort(orderSchedule);
 			}
 	@Override
 	protected void initialize() {
-		int index = 0;
-		subscribeBroadcast(TickBroadcast.class, br -> currentTick=br.getTick());
+		subscribeBroadcast(TickBroadcast.class, br -> {
+			currentTick=br.getTick();
+			int index = 0;
 			while (orderSchedule[index].getTick() == currentTick) {
 				index++;
 				BookOrderEvent bookOrderEvent = new BookOrderEvent(currentTick);
-				Future orderReceipt = sendEvent(bookOrderEvent);
+				Future<OrderReceipt> orderReceipt = sendEvent(bookOrderEvent);
+				
 			}
+		});
+
 		}
 	}
 

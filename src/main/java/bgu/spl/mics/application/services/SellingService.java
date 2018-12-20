@@ -21,16 +21,17 @@ import bgu.spl.mics.application.passiveObjects.*;
  */
 public class SellingService extends MicroService{
 	protected int currentTick = 0;
+	MoneyRegister moneyRegister;
 
 	public SellingService(String name) {
 		super(name);
+		this.moneyRegister = MoneyRegister.getInstance();
 	}
 
 	@Override
 	protected void initialize() {
 		subscribeBroadcast(TickBroadcast.class, br -> currentTick=br.getTick());
 		subscribeEvent(BookOrderEvent.class, ev -> {
-
 		});
 		
 	}

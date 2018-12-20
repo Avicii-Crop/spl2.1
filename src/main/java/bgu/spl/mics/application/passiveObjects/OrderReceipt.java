@@ -23,7 +23,11 @@ import java.io.Serializable;
 
 	}
 
-	/**
+	public boolean get() {
+		return
+		}
+
+		/**
      * Retrieves the orderId of this receipt.
      */
 	public int getOrderId() {
