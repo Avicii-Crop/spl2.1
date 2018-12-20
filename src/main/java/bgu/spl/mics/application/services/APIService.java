@@ -2,13 +2,10 @@ package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.Future;
 import bgu.spl.mics.MicroService;
-import bgu.spl.mics.application.BookStoreRunner;
-import bgu.spl.mics.application.BookStoreRunner.InputJson.OrderSchedule;
 import bgu.spl.mics.application.messages.BookOrderEvent;
 	import bgu.spl.mics.application.messages.TickBroadcast;
-import bgu.spl.mics.application.passiveObjects.Customer;
-import bgu.spl.mics.application.passiveObjects.OrderReceipt;
-import com.sun.org.apache.xpath.internal.operations.Or;
+import bgu.spl.mics.application.passiveObjects.*;
+
 
 import java.util.Arrays;
 
@@ -17,19 +14,19 @@ import java.util.Arrays;
  * It informs the store about desired purchases using {@link BookOrderEvent}.
  * This class may not hold references for objects which it is not responsible for:
  * {@link ResourcesHolder}, {@link MoneyRegister}, {@link Inventory}.
- * 
+ *
  * You can add private fields and public methods to this class.
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class APIService extends MicroService{
-	private OrderSchedule[] orderSchedule;
+	private Customer.OrderSchedule[] orderSchedule;
 	private Customer customer;
 	private int currentTick = 0;
 
 
 
-	public APIService(int i, OrderSchedule[] orderSchedule, Customer customer) {
-		super("webAPI" + i);
+	public APIService(String num, Customer.OrderSchedule[] orderSchedule, Customer customer) {
+		super("webAPI" + num);
 		this.orderSchedule = orderSchedule;
 		this.customer = customer;
 		Arrays.sort(orderSchedule);
@@ -43,11 +40,12 @@ public class APIService extends MicroService{
 				index++;
 				BookOrderEvent bookOrderEvent = new BookOrderEvent(currentTick,customer);
 				Future<OrderReceipt> orderReceipt = sendEvent(bookOrderEvent);
-				if (orderReceipt.get() != null){
-					customer.addOrderReciept(orderReceipt);
+//				complete(orderReceipt, );
+//				if (orderReceipt.isDone()){
+//					customer.addOrderReciept(orderReceipt);
 				}
 			}
-		});
+		);
 		}
 	}
 
